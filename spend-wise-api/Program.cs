@@ -23,6 +23,17 @@ builder.Services.AddSingleton<RegistrosService>();
 builder.Services.AddControllers(); // Adiciona o suporte a controladores
 builder.Services.AddSwaggerGen();
 
+// Adicionar configurações de CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
 // Registrar páginas Razor (caso sejam necessárias)
 builder.Services.AddRazorPages();
 
@@ -48,6 +59,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
+
+// Aplicar a política de CORS
+app.UseCors("AllowAllOrigins");
 
 // Configurar endpoints da API e páginas
 app.MapControllers(); // Certifique-se de que controladores estão mapeados

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using spend_wise_api.data;
+using spend_wise_api.services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,16 +9,21 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<MongoDBSettings>(
     builder.Configuration.GetSection("MongoDB"));
 
-// Registrar o serviço MongoDB
+// Registrar o cliente MongoDB
 builder.Services.AddSingleton<IMongoClient, MongoClient>(sp =>
 {
     var settings = sp.GetRequiredService<IOptions<MongoDBSettings>>().Value;
     return new MongoClient(settings.ConnectionString);
 });
 
-// Adicionar o Swagger
+// Registrar o serviço RegistrosService
+builder.Services.AddSingleton<RegistrosService>();
+
+// Adicionar controladores e Swagger
+builder.Services.AddControllers(); // Adiciona o suporte a controladores
 builder.Services.AddSwaggerGen();
 
+// Registrar páginas Razor (caso sejam necessárias)
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
@@ -42,6 +48,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
+
+// Configurar endpoints da API e páginas
+app.MapControllers(); // Certifique-se de que controladores estão mapeados
 app.MapRazorPages();
 
 app.Run();
